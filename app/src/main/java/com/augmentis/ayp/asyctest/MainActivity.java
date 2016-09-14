@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            return null;
+            return "finish";
         }
 
         @Override
@@ -58,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
 
             mTextView = (TextView) findViewById(R.id.textShow);
             mTextView.setText(values[0].toString());
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            mTextView.setText(s.toString());
         }
     }
 
