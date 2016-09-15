@@ -1,6 +1,7 @@
 package com.augmentis.ayp.asyctest;
 
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,29 +9,53 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TestLooper.Callbacks{
     private EditText mEditText;
-    private TextView mTextView;
+    protected TextView mTextView;
     private Button mButton;
-    private int val;
+    private Handler handlerMainThread;
+    private Integer val;
+    private TestLooper testLooper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mEditText = (EditText) findViewById(R.id.textInput);
+        handlerMainThread = new Handler();
 
+        mEditText = (EditText) findViewById(R.id.textInput);
         mButton = (Button) findViewById(R.id.button);
+        mTextView = (TextView) findViewById(R.id.textShow);
+
+        testLooper = new TestLooper("ThreadName",this);
+
+        testLooper.setHandlerMainThread(handlerMainThread);
+        testLooper.start();
+        testLooper.onLooperPrepared();
+
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                //--- AsyncTask --- //
                 val = Integer.parseInt(mEditText.getText().toString());
-                new CountNumber().execute(val);
+                testLooper.addMessage(val);
+//                new CountNumber().execute(val);
+
+                //
+
+
 
             }
         });
+    }
+
+    @Override
+    public void convertNum(String nums) {
+        mTextView.setText(nums);
+
     }
 
     class CountNumber extends AsyncTask<Integer, Integer, String>{
@@ -56,8 +81,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(Integer... values) {
 
-            mTextView = (TextView) findViewById(R.id.textShow);
-            mTextView.setText(values[0].toString());
+//            mTextView = (TextView) findViewById(R.id.textShow);
+//            mTextView.setText(values[0].toString());
         }
 
         @Override
